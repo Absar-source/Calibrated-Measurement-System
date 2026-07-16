@@ -8,3 +8,6 @@ calibration images/
 *.jpeg
 *.png
 *.mp4
+*.pth
+*.npz
+*.zip

@@ -12,7 +12,7 @@ from PIL import Image
 # Adjust these paths depending on where you run the script from your terminal
 CALIB_FILE = 'calibration/camera_params.npz'
 MODEL_WEIGHTS = 'model/simple_calculator_model.pth'
-TEST_IMAGE = 'calibration/images/IMG_20260715_091609.jpeg' # Change this to your test image name
+TEST_IMAGE = 'data/IMG_20260715_134648.jpg' # Change this to your test image name
 
 def get_simple_model(num_classes):
     """Rebuild the exact architecture used in training."""
@@ -51,9 +51,17 @@ def main():
     new_camera_mtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
     undistorted_img = cv2.undistort(img_cv, mtx, dist, None, new_camera_mtx)
     
+    # # Crop the image based on the ROI to remove curved black edges
+    # x, y, w_roi, h_roi = roi
+    # undistorted_img = undistorted_img[y:y+h_roi, x:x+w_roi]
     # Crop the image based on the ROI to remove curved black edges
     x, y, w_roi, h_roi = roi
-    undistorted_img = undistorted_img[y:y+h_roi, x:x+w_roi]
+    
+    # Safety check: Only crop if the ROI dimensions are larger than 0
+    if w_roi > 0 and h_roi > 0:
+        undistorted_img = undistorted_img[y:y+h_roi, x:x+w_roi]
+    else:
+        print("Warning: Calibration ROI was zero. Skipping the crop step.")
 
     print("4. Running AI Inference...")
     # Convert OpenCV image (BGR) to RGB PIL format for PyTorch

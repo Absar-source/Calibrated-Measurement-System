@@ -5,8 +5,8 @@ import os
 
 # --- Configuration ---
 # Your printed grid is 7x9 squares, which means 6x8 inner corners
-CHECKERBOARD = (6, 8)
-IMAGE_DIR = 'calibration/images/*.jpeg'  
+CHECKERBOARD = (10, 7)
+IMAGE_DIR = 'calibration/images2/*.jpg'  
 OUTPUT_FILE = 'calibration/camera_params.npz'
 
 def calibrate_camera():
@@ -31,7 +31,7 @@ def calibrate_camera():
 
     for fname in images:
         img = cv2.imread(fname)
-        # img =  cv2.resize(img,(1080,720))
+        img =  cv2.resize(img,(1080,720))
         gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         # Find the chess board corners
@@ -60,7 +60,10 @@ def calibrate_camera():
     print("\n--- Calibration Complete ---")
     print(f"Reprojection Error: {ret:.4f} pixels")
     print(f"Parameters saved to {OUTPUT_FILE}")
-    
+    print("Camera Matrix:",mtx)
+    print("Distortion Coefficients:",dist)
+    print("Rotation Vectors:",rvecs)
+    print("Translation Vectors:",tvecs)
     if ret < 0.5:
         print("Status: EXCELLENT (Error is below 0.5)")
     elif ret < 1.0:

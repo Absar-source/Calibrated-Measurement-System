@@ -38,18 +38,32 @@ def main():
     if img_cv is None:
         print(f"Error: Could not read {TEST_IMAGE}")
         return
+    # We extract the expected width and height directly from your perfect matrix
+    calib_w = int(mtx[0, 2] * 2) 
+    calib_h = int(mtx[1, 2] * 2)
     
+    # Resize the test image so it perfectly matches the calibration math
+    img_cv = cv2.resize(img_cv, (calib_w, calib_h))
     raw_rgb = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
 
+    # # STEP 2: UNDISTORT THE IMAGE
+    # h, w = img_cv.shape[:2]
+    # new_camera_mtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
+    # undistorted_img = cv2.undistort(img_cv, mtx, dist, None, new_camera_mtx)
+    
+    # x, y, w_roi, h_roi = roi
+    # if w_roi > 0 and h_roi > 0:
+    #     undistorted_img = undistorted_img[y:y+h_roi, x:x+w_roi]
     # STEP 2: UNDISTORT THE IMAGE
     h, w = img_cv.shape[:2]
     new_camera_mtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
-    undistorted_img = cv2.undistort(img_cv, mtx, dist, None, new_camera_mtx)
+    # undistorted_img = cv2.undistort(img_cv, mtx, dist, None, new_camera_mtx)
     
-    x, y, w_roi, h_roi = roi
-    if w_roi > 0 and h_roi > 0:
-        undistorted_img = undistorted_img[y:y+h_roi, x:x+w_roi]
-    
+    # x, y, w_roi, h_roi = roi
+    # if w_roi > 0 and h_roi > 0:
+    #     undistorted_img = undistorted_img[y:y+h_roi, x:x+w_roi]
+    #     print("undistorted_img",undistorted_img.shape)
+    undistorted_img = cv2.undistort(img_cv, mtx, dist, None, mtx)
     undistorted_rgb = cv2.cvtColor(undistorted_img, cv2.COLOR_BGR2RGB)
 
     # STEP 3: AI INFERENCE
